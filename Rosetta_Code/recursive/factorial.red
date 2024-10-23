@@ -1,4 +1,4 @@
-#! /usr/local/bin/Red
+#! /usr/local/bin/red-cli
 Red [
 	Title:	"Red Tests: Recursivity (Factorial)"
 	Author:	"ldci"
@@ -29,7 +29,11 @@ factorial2: func [n][any [if n = 0 [1] n * factorial2 n - 1]]
 factorial3: func [n][do pick [[n * factorial3 n - 1] 1] n > 1]
 
 ;--Memoized with map! datatype
-factorial4: function [n][m: #(0 1) any [m/:n m/:n: n * factorial4 n - 1]]
+factorial4: function [n [integer!]
+][	
+	;m: #(0 1) 	;--red 0.64
+	m: #[0 1]	;--red 0.65
+	any [m/:n m/:n: n * factorial4 n - 1]]
 
 ;--tests
 print "Iterative Factorial 1..12"
