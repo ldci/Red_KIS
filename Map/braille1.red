@@ -2,8 +2,7 @@
 Red [
 	Title: "braille1"
 	Author: "ldci"
-	Version: 1.0
-	Notes: {Plays map}
+	File: %braille1.red
 ]
 ;-- French Braille's cell is a 2x3 matrix with 6 points
 comment [1 4 2 5 3 6]

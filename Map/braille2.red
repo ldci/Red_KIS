@@ -2,7 +2,7 @@
 Red [
 	Title: "braille2"
 	Author: "ldci"
-	Version: 2.0
+	File: 	%braille2.Red
 	Needs: view
 ]
 ;-- Electronic Braille's cell is a 2x4 matrix with 8 points
@@ -12,9 +12,9 @@ comment [1 4 2 5 3 6 7 8]
 tstr: {A key problem of software development today is software bloat, where huge toolchains and development environments are needed in software coding and deployment. Ivo Balbaert.} 
 
 
-;--map does not work : so just use 2 blocks
+;--This version uses 2 blocks for ANSI and Braille codes
 generateCodes: does [
-	i: 0
+	i: 32
 	blkC: copy []		;--ANSI Codes
 	blkB: copy []		;--Braille Codes
 	while [i <= 255] [
