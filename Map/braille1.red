@@ -1,17 +1,16 @@
 #!/usr/local/bin/red-view
 Red [
-	Title: "braille"
+	Title: "braille1"
 	Author: "ldci"
 	Version: 1.0
 	Notes: {Plays map}
-	Needs: view
 ]
 ;-- French Braille's cell is a 2x3 matrix with 6 points
 comment [1 4 2 5 3 6]
 
 active:   to-char 1F534h
 inactive: to-char 26ABh
-str: "Hello Red World 1"
+str: "Hello Red World! ~ 1 2"
 
 bCodes: make map! [
 	#"a" [1 0 0 0 0 0]
@@ -62,6 +61,7 @@ bCodes: make map! [
 	#"!" [0 0 1 1 1 0]
 	#"?" [0 0 1 0 0 1]
 	#"-" [0 0 0 0 1 1]
+	#"+" [0 1 0 0 1 1]
 	#"(" [0 0 1 1 0 0]
 	#")" [0 0 0 1 1 1]
 	#"^"" [0 0 1 1 1 1]
@@ -79,9 +79,9 @@ bCodes: make map! [
 	#"9" [0 1 1 0 0 1]
 	#"0" [0 1 0 1 1 1]
 	#" " [0 0 0 0 0 0]	;--for space 
-	"maj" [0 1 0 0 0 1]	;--uppercase prefix
-	"ita" [0 1 0 1 0 1]	;--italic prefix
-	"num" [0 0 0 0 0 1]	;--numerical prefix
+	#"µ" [0 0 0 0 0 1]	;--uppercase prefix alt m
+	#"¬" [0 1 0 0 0 1]	;--italic prefix alt l
+	#"~" [0 1 0 1 1 1]	;--numerical prefix alt n
 ]
 
 generateCell: func [code [char! string!]
