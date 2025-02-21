@@ -12,7 +12,7 @@ print "hash! datatype"
 h1: make hash! [a 10 b 50 c 100]
 print length? h1		;--6	
 print [h1/a h1/b h1/c]	;--path notation with key
-print [h1/2 h1/4 h1/6]	;--path notation witn index
+print [h1/2 h1/4 h1/6]	;--path notation with index
 print select h1 [a]		;--key in a block
 print select h1 'b		;--key as a literal word
 print get 'h1/c			;--with get word function
