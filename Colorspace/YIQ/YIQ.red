@@ -7,7 +7,7 @@ Red [
 {RGB to YIQ conversion is used in the NTSC encoder where the RGB inputs are converted to a luminance (Y) and two chrominance information (I,Q).}
 
 margins: 5x5
-size: 512x512
+iSize: 512x512
 m1: copy []  
 m2: copy []
 m3: copy []
@@ -21,10 +21,11 @@ loadImage: does [
 		canvas/image: img1
 		f/text: rejoin ["Image Size: "  form img1/size]
 		isFile?: true 
+		bt1/enabled?: true
 	]
 ]
 ;--RGB->YIQ
-RGB2YIQ: does [
+RGB2YIQ: function[] [
 	tt: dt [
 		rgb: img1/rgb
 		clear m1 
@@ -38,16 +39,17 @@ RGB2YIQ: does [
 			II: to integer! (I * 255) if II < 0 [II: 0]		;--[0:255] range 
 			QQ: to integer! (Q * 255) if QQ < 0 [QQ: 0]		;--[0:255] range 
 			append append append m1 Y I Q 					;--float values for reverse
-			append append append m2 QQ II YY				;--use BGR mode  
+			append append append m2 YY II QQ				;--use RGB mode  
 		]
-		img2: make image! reduce [img1/size to binary! m2]	;--BGR image
+		img2: make image! reduce [img1/size to binary! m2]	;--RGB image
 		canvas/image: img2
 	]
+	bt2/enabled?: true
 	f/text: rejoin ["Image Size: "  form img1/size " in: " round/to third tt 0.01 " sec"]
 ]
 
 ;--YIQ->RGB
-YIQ2RGB: does [
+YIQ2RGB: function[] [
 	tt: dt [
 		clear m3
 		foreach [Y I Q] m1 [
@@ -68,13 +70,14 @@ view win: layout [
 		title "RGB <-> YIQ"
 		origin margins space margins
 		across
-		button 100 "Load RGB"		[loadImage]
-		button 100 "RGB -> YIQ"		[if isfile? [RGB2YIQ]]
-		button 100 "YIQ -> RGB"		[if isfile? [YIQ2RGB]]
+		button 100 "Load RGB"			[loadImage]
+		bt1: button 100 "RGB -> YIQ"	[if isfile? [RGB2YIQ]]
+		bt2: button 100 "YIQ -> RGB"	[if isfile? [YIQ2RGB]]
 		pad 115x0
 		button 70 "Quit" 			[Quit]
 		return
-		canvas: base size
+		canvas: base iSize
 		return 
 		f: field 512
+		do [bt1/enabled?: bt2/enabled?: false]
 ]
