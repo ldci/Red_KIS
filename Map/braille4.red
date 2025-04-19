@@ -1,42 +1,39 @@
 #!/usr/local/bin/red-view
 Red [
-	Title: "braille3"
+	Title: "braille4"
 	Author: "ldci"
 	File: %braille4.red
 	Needs: view
 ]
-;-- Electronic Braille's cell is a 2x4 matrix with 8 points
-comment [1 4 2 5 3 6 7 8]
+;-- Electronic Braille's cell is a 2x4 matrix with 8 dots
+comment [dots order 1 4 2 5 3 6 7 8]
 
 ;tstr: "Hello Fantastic Red World!"
 tstr: {Red language is smart for basic image processing. However, since Red is still young and under development, most of useful functions are not yet implemented. This is why RedCV exists.} 
 
 ;--generate ANSI and Braille codes
+;--for i 10241 10495 1 [print [i to char! i]]
+;--append is not supported by map! so we use extend
 generateCodes: does [
 	i: 32
-	blk: []
+	codes: #[]
 	while [i <= 255] [
-		idx: i + 10240;--for Braille code first value
-		key: rejoin [to-char i]
-		value: rejoin [to-char idx]
-		append append blk key value
+		idx: i + 10240				;--for Braille code value
+		key: form to-char i			;--ANSI code
+		value: form to-char idx		;--Braille code
+		extend codes reduce [key value]
 		i: i + 1
 	]
-	codes: make map! blk			;--OK a map from block
 ]
 
-getCode: func [code [string!]
-"Returns Braille code"
-][
-	select codes code
-]
-processString: func [astring [string!]
+processString: func [string [string!]
 "Process ANSI string and returns Braille string"
 ][	
 	str: copy ""
-	foreach c astring [append append str getCode form c " "]
+	foreach c string [append str select codes form c]
 	str
 ]
+
 ;--we can use say with macOS 
 sayString: does [
 	prog: rejoin ["say -v " "Daniel" " " a1/text]
@@ -44,16 +41,16 @@ sayString: does [
 ]
 
 mainWin: layout [
-	title "Braille [256/8 points Codes]"
+	title "Braille [256/8 dots Codes]"
 	b1: button "Generate" [if cb/data [sayString] a2/text: processString a1/text]
 	cb: check "Sound" false
-	b2: button "Clear" [clear a2/text]
+	b2: button "Clear" [clear a1/text clear a2/text]
 	pad 75x0
 	b3: button "Quit" [quit]
 	return
 	a1: area 400x75 wrap
 	return
-	a2: area 400x150 wrap font-size 24 font-color black
+	a2: area 400x200 wrap font-size 24 font-color blue
 	do [a1/text: tstr generateCodes]
 ]
 view mainWin
