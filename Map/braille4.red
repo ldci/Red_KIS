@@ -15,24 +15,30 @@ tstr: {Red language is smart for basic image processing. However, since Red is s
 ;--for i 10241 10495 1 [print [i to char! i]]
 ;--append is not supported by map! so we use extend
 generateCodes: does [
-	i: 32
-	codes: #[]
+	i: 0										;--all codes
+	codesA: #[]									;--a map object ANSI->Braille
+	codesB: #[]									;--a map object Braille->ANSI
 	while [i <= 255] [
-		idx: i + 10240				;--for Braille code value
-		key: form to-char i			;--ANSI code
-		value: form to-char idx		;--Braille code
-		extend codes reduce [key value]
+		idx: i + 10240							;--for Braille code value
+		key: form to-char i						;--ANSI code
+		value: form to-char idx					;--Braille code
+		extend/case codesA reduce [key value]	;--update map
+		extend/case codesB reduce [value key]	;--update map
 		i: i + 1
 	]
 ]
 
-processString: func [string [string!]
-"Process ANSI string and returns Braille string"
+processString: func [
+"Processes ANSI string or Braille string"
+	string [string!]
+	/ansi /braille
 ][	
 	str: copy ""
-	foreach c string [append str select codes form c]
+	;--for ansi use select/case, characters are case-sensitive
+	if ansi [foreach c string [append str select/case codesA form c]] 
+	if braille [foreach c string [append str select codesB form c]]
 	str
-]
+] 
 
 ;--we can use say with macOS 
 sayString: does [
@@ -42,15 +48,21 @@ sayString: does [
 
 mainWin: layout [
 	title "Braille [256/8 dots Codes]"
-	b1: button "Generate" [if cb/data [sayString] a2/text: processString a1/text]
+	b1: button "Generate" [
+		if cb/data [sayString] 
+		a2/text: processString/ansi a1/text
+		a3/text: processString/braille a2/text
+	]
 	cb: check "Sound" false
-	b2: button "Clear" [clear a1/text clear a2/text]
+	b2: button "Clear" [clear a1/text clear a2/text clear a3/text]
 	pad 75x0
 	b3: button "Quit" [quit]
 	return
 	a1: area 400x75 wrap
 	return
 	a2: area 400x200 wrap font-size 24 font-color blue
+	return
+	a3: area 400x75 wrap
 	do [a1/text: tstr generateCodes]
 ]
 view mainWin
