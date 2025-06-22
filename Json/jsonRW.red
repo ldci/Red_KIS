@@ -34,3 +34,9 @@ print to-json m
 
 blk: [name "Pierre" age 40 city "Rouen"]
 print to-json to-map blk
+
+;--Arrays in objects
+m: #[name "John" age: 50 cars ["Ford" "BMW" "Fiat"]]
+probe m
+print to-json m
+;save %test.json m
