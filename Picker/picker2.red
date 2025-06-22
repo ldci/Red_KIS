@@ -3,7 +3,7 @@ Red[
 	Needs: 'View
 ]
 ;--without pad and with react
-names: ["Carl Sassenrath" "David (Oldes) Oliva" "Nenad Rakocevic" "Chris Lattner"]
+names: ["Carl Sassenrath" "David Oliva (Oldes)" "Nenad Rakocevic" "Chris Lattner"]
 languages: ["Rebol 2" "Rebol 3" "Red" "Swift"]
 win: layout [
     title "Picker"
