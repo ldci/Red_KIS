@@ -1,0 +1,4 @@
+darkMode: yes
+either darkMode [fcolor: white] [fcolor: black]
+then update face with font-color fcolor
+A lot of examples comes from Ungaretti's Helpin' Red
