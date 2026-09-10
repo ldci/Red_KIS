@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+<key>files</key>
+<dict>
+<key>Resources/AppIcon.icns</key>
+<data>do8pBmEvuDqyNYr4OVoXEAnv4rE=</data>
+</dict>
+<key>files2</key>
+<dict>
+<key>MacOS/libRedRT.dylib</key>
+<dict>
+<key>cdhash</key>
+<data>/BAofALQhjcmoVnQeTYUwUlerX8=</data>
+<key>requirement</key>
+<string>cdhash H&quot;fc10287c02d0863726a159d0793614c1495ead7f&quot;</string>
+</dict>
+<key>Resources/AppIcon.icns</key>
+<dict>
+<key>hash</key>
+<data>do8pBmEvuDqyNYr4OVoXEAnv4rE=</data>
+<key>hash2</key>
+<data>WHWqBAfUxOZWvNqIeUw7zQtGgxNgEY/84v0tmwPT/IU=</data>
+</dict>
+</dict>
+<key>rules</key>
+<dict>
+	<key>^Resources/</key>
+	<true/>
+	<key>^Resources/.*\.lproj/</key>
+	<dict><key>optional</key><true/><key>weight</key><real>1000</real></dict>
+	<key>^Resources/.*\.lproj/locversion.plist$</key>
+	<dict><key>omit</key><true/><key>weight</key><real>1100</real></dict>
+	<key>^Resources/Base\.lproj/</key>
+	<dict><key>weight</key><real>1010</real></dict>
+	<key>^version.plist$</key>
+	<true/>
+</dict>
+<key>rules2</key>
+<dict>
+	<key>.*\.dSYM($|/)</key>
+	<dict><key>weight</key><real>11</real></dict>
+	<key>^.*</key>
+	<true/>
+	<key>^(.*/)?\.DS_Store$</key>
+	<dict><key>omit</key><true/><key>weight</key><real>2000</real></dict>
+	<key>^(Frameworks|SharedFrameworks|PlugIns|Plug-ins|XPCServices|Helpers|MacOS|Library/(Automator|Spotlight|LoginItems))/</key>
+	<dict><key>nested</key><true/><key>weight</key><real>10</real></dict>
+	<key>^[^/]+$</key>
+	<dict><key>nested</key><true/><key>weight</key><real>10</real></dict>
+	<key>^embedded\.provisionprofile$</key>
+	<dict><key>weight</key><real>20</real></dict>
+	<key>^Info\.plist$</key>
+	<dict><key>omit</key><true/><key>weight</key><real>20</real></dict>
+	<key>^PkgInfo$</key>
+	<dict><key>omit</key><true/><key>weight</key><real>20</real></dict>
+	<key>^Resources/</key>
+	<dict><key>weight</key><real>20</real></dict>
+	<key>^Resources/.*\.lproj/</key>
+	<dict><key>optional</key><true/><key>weight</key><real>1000</real></dict>
+	<key>^Resources/.*\.lproj/locversion.plist$</key>
+	<dict><key>omit</key><true/><key>weight</key><real>1100</real></dict>
+	<key>^Resources/Base\.lproj/</key>
+	<dict><key>weight</key><real>1010</real></dict>
+	<key>^version\.plist$</key>
+	<dict><key>weight</key><real>20</real></dict>
+</dict>
+</dict>
+</plist>
