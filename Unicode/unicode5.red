@@ -14,6 +14,19 @@ margins: 5x5
 start: 0
 end: 127
 
+;-- 1. On crée la fenêtre secondaire à l'avance
+pop: layout [
+    title "Image Copy"
+    pop-img: image 400x300
+    ;-- On utilise visible? pour cacher la fenêtre
+    button "Close" [pop/visible?: no show pop] 
+]
+
+;-- 2. On l'enregistre dans le système en dehors de l'écran
+view/no-wait/options pop [offset: 10000x10000]
+pop/visible?: no
+show pop
+
 codes: [
 "0x0000-0x007F 0-127 Latin Basic"
 "0x0080-0x00FF 128-255 Latin-1 Supplement"
@@ -142,10 +155,10 @@ getUnicodes: does [
 view win: layout [
 	title "Unicode Chart [UTF and Pictograms]"
 	origin margins space margins
-	text 80 "Code Number"  	f0: field 50 ""
-	text 40 "Start" 		f1: field 55 "" 
-	text 30 "End"   		f2: field 55 "" 
-	pad 165x0
+	text 85 "Code Number" middle 	f0: field 50 ""
+	text 40 "Start" middle		f1: field 55 "" 
+	text 30 "End"  middle 		f2: field 55 "" 
+	pad 160x0
 	f3: area 120x24 font-color fcolor center
 	pad 120x0  button "Quit" 80 [Quit] return
 	text-list 500x350 font-size 12 font-color fcolor data codes
@@ -185,10 +198,16 @@ view win: layout [
 	sb1: field 300
 	p: progress 140x23 sb2: field 50 ""
 	sb3: field 120 center
-	button 200 "Copy to the clipboard" [
-		img: to-image cc
-		write-clipboard img
-		view [title "Image Copy" image 400x300 img button "Close" [unview]]
-	]
+    button 200 "Copy to the clipboard" [
+        img: to-image cc
+        write-clipboard img
+        ;-- 4. On met à jour l'image et on affiche la fenêtre
+        pop-img/image: img
+        pop/offset: 100x100
+        pop/visible?: yes
+        show pop
+    ]
+    
+    
 	do [f0/enabled?: f1/enabled?: f2/enabled?: no]
 ]
