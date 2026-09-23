@@ -3,7 +3,7 @@
 I'm frequently using OCR Tesseract when I have to recognize text in images. 
 Tesseract was initially developed  by Hewlett Packard Labs. In 2005, it was open sourced by HP, and since 2006 it has been actively developed by Google and open source community.
 
-In version 4, Tesseract has implemented a long short term memory (LSTM) recognition engine which is a kind of recurrent neural network (RNN) very efficient for OCR.
+From version 4, Tesseract has implemented a long short term memory (LSTM) recognition engine which is a kind of recurrent neural network (RNN) very efficient for OCR.
 
 Tesseract library includes a command line tool *tesseract* which can be used  to perform OCR on images and output the result in a text file.
 
@@ -21,149 +21,20 @@ This operation is really trivial since Red includes a *call* fonction which make
 
 
 ```
+#! /usr/local/bin/red-view
 Red [
 	Title:   "OCR"
 	Author:  "Francois Jouen"
-	File: 	  %tesseract.red
-	Needs:	  View
-	icon:	  %red.ico
-]
-; Languages
-`tessdata: [
-"afr (Afrikaans)"
-"amh (Amharic)"
-"ara (Arabic)"
-"asm (Assamese)"
-"aze (Azerbaijani)"
-"aze_cyrl (Azerbaijani - Cyrilic)"
-"bel (Belarusian)"
-"ben (Bengali)"
-"bod (Tibetan)"
-"bos (Bosnian)"
-"bre (Breton)"
-"bul (Bulgarian)"
-"cat (Catalan; Valencian)"
-"ceb (Cebuano)"
-"ces (Czech)"
-"chi_sim (Chinese - Simplified)"
-"chi_tra (Chinese - Traditional)"
-"chr (Cherokee)"
-"cym (Welsh)"
-"dan (Danish)"
-"deu (German)"
-"dzo (Dzongkha)"
-"ell (Greek Modern (1453-)"
-"eng (English)"
-"enm (English Middle (1100-1500)"
-"epo (Esperanto)"
-"equ (Math / equation detection module)"
-"est (Estonian)"
-"eus (Basque)"
-"fas (Persian)"
-"fin (Finnish)"
-"fra (French)"
-"frk (Frankish)"
-"frm (French Middle (ca.1400-1600)"
-"gle (Irish)"
-"glg (Galician)"
-"grc (Greek Ancient (to 1453)"
-"guj (Gujarati)"
-"hat (Haitian; Haitian Creole)"
-"heb (Hebrew)"
-"hin (Hindi)"
-"hrv (Croatian)"
-"hun (Hungarian)"
-"iku (Inuktitut)"
-"ind (Indonesian)"
-"isl (Icelandic)"
-"ita (Italian)"
-"ita_old (Italian - Old)"
-"jav (Javanese)"
-"jpn (Japanese)"
-"kan (Kannada)"
-"kat (Georgian)"
-"kat_old (Georgian - Old)"
-"kaz (Kazakh)"
-"khm (Central Khmer)"
-"kir (Kirghiz; Kyrgyz)"
-"kor (Korean)"
-"kor_vert (Korean (vertical)"
-"kur (Kurdish)"
-"kur_ara (Kurdish (Arabic)"
-"lao (Lao)"
-"lat (Latin)"
-"lav (Latvian)"
-"lit (Lithuanian)"
-"ltz (Luxembourgish)"
-"mal (Malayalam)"
-"mar (Marathi)"
-"mkd (Macedonian)"
-"mlt (Maltese)"
-"mon (Mongolian)"
-"mri (Maori)"
-"msa (Malay)"
-"mya (Burmese)"
-"nep (Nepali)"
-"nld (Dutch; Flemish)"
-"nor (Norwegian)"
-"oci (Occitan (post 1500)"
-"ori (Oriya)"
-"osd (Orientation and script detection module)"
-"pan (Panjabi; Punjabi)"
-"pol (Polish)"
-"por (Portuguese)"
-"pus (Pushto; Pashto)"
-"que (Quechua)"
-"ron (Romanian; Moldavian; Moldovan)"
-"rus (Russian)"
-"san (Sanskrit)"
-"sin (Sinhala; Sinhalese)"
-"slk (Slovak)"
-"slv (Slovenian)"
-"snd (Sindhi)"
-"spa (Spanish; Castilian)"
-"spa_old (Spanish; Castilian - Old)"
-"sqi (Albanian)"
-"srp (Serbian)"
-"srp_latn (Serbian - Latin)"
-"sun (Sundanese)"
-"swa (Swahili)"
-"swe (Swedish)"
-"syr (Syriac)"
-"tam (Tamil)"
-"tat (Tatar)"
-"tel (Telugu)"
-"tgk (Tajik)"
-"tgl (Tagalog)"
-"tha (Thai)"
-"tir (Tigrinya)"
-"ton (Tonga)"
-"tur (Turkish)"
-"uig (Uighur; Uyghur)"
-"ukr (Ukrainian)"
-"urd (Urdu)"
-"uzb (Uzbek)"
-"uzb_cyrl (Uzbek - Cyrilic)"
-"vie (Vietnamese)"
-"yid (Yiddish)"
-"yor (Yoruba)"
-]
-;OCR Engine Mode
-ocr: [
-"Original Tesseract only"
-"Neural nets LSTM only"
-"Tesseract + LSTM"
-"Default, based on what is available"
+	File: 	 %tesseract.red
+	Needs:	 View
+	icon:	%red.ico
 ]
 
+;--only for image files. Non support for pdf files
 
-
-appDir: "Please adapt or use what-dir"
-appDir: what-dir
-tFile: to-file rejoin[appDir "tempo"]
-tFileExt: to-file rejoin[appDir "tempo.txt"]
-change-dir to-file appDir
-
+appDir: to-red-file "/Users/fjouen/Programmation/Red_ARM/Code/Tesseract"
+output: %tempo/result-ocr
+change-dir appDir
 dSize: 512
 gsize: as-pair dSize dSize
 img: make image! reduce [gSize black]
@@ -171,6 +42,7 @@ lang: "eng"
 ocrMode: 3
 tmpf: none
 tBuffer: copy []
+#include %languages/tessdata.red
 
 loadImage: does [
 	tmpf: request-file
@@ -179,28 +51,45 @@ loadImage: does [
 		clear result/text
 		img: load tmpf
 		canvas/image: img
+		tFile: form tmpf
 		isFile: true	
 	]
 ]
 
+ocr: [
+"Original Tesseract only"
+"Neural nets LSTM only"
+"Tesseract + LSTM"
+"Default, based on what is available"
+]
+
+
 processFile: does [
 	if isFile [
-		if exists? tFileExt [delete tFileExt]
+		if exists? output [delete output]
 		clear result/text 
-		prog: copy "/usr/local/bin/tesseract " 
-		append prog form tmpf 
-		append append prog " " form tFile
-		case [
-			ocrMode = 0 [append append prog " -l " lang]
-			ocrMode = 1 [append append prog " -l " lang append append prog " --oem " ocrMode]
-			ocrMode = 2 [append append prog " -l " lang]
-			ocrMode = 3 [append append prog " -l " lang append append prog " --oem " ocrMode]
-		]
+		
+		;tessearact rajoute l'extension.txt à l'output
+		output: %tempo/result-ocr
+		; Construction de la commande de base
+		cmd: reduce ["tesseract " tmpf output "-l " lang]
+
+		; Ajout de --oem seulement si nécessaire (modes 1 et 3)
+		if find [1 3] ocrMode [append cmd reduce ["--oem" ocrMode]]
+		
+		; Formatage final en une seule chaîne
+		prog: form reduce cmd
+
 		call/wait prog
+		
+	    f2/text: form ret: call/wait prog
+		;--maintenant pour Red 
+		output: %tempo/result-ocr.txt
+
 		either cb/data [
 			clear tbuffer
 			clear result/data
-			tt: read tFileExt
+			tt: read output
 			tbuffer: split tt "^/"
 			nl: length? tbuffer 
 			i: 1
@@ -211,41 +100,43 @@ processFile: does [
 				i: i + 1
 			]
 			result/text: copy form result/data]
-		[result/text: read tFileExt]
+			[result/text: read output]
 	]
 ]
 
-; ***************** Test Program Interface ************************
+
+
+; ***************** Test Program Interface ****************************
 view win: layout [
 		title "Tesseract OCR with Red"
 		button  "Load Image" [loadImage]	
-		text 60 "Language"
+		text 60 middle "Language"
 		dp1: drop-down 180 data tessdata
 		select 24
 		on-change [ 
 			s: dp1/data/(face/selected)
 			lang: first split s " "
 		]
-		text 80 "OCR mode" 
+		text 80 middle  "OCR mode" 
 		dp2: drop-down 230 data ocr
 		select 4
 		on-change [ocrMode: face/selected - 1]
 		cb: check "Lines" false
 		button "Process" 		[processFile]
 		button "Clear"			[clear result/text]
-		button "Quit" 			[if exists? tFileExt [delete tFileExt] Quit]
+		button "Quit" 			[if exists? output [delete output] Quit]
 		return
 		canvas: base gsize img
-		result: area  gsize font [name: "Arial" size: 16 color: black] 
+		result: area white gsize wrap font [name: "Arial" size: 16 color: black] 
 			data []		
 		return
-		f: field  512
-		text "Font"
+		f: field  452 f2: field 40 center
+		text middle "Font"
 		drop-list 120
 			data  ["Arial" "Consolas" "Comic Sans MS" "Times" "Hannotate TC"]
 			react [result/font/name: pick face/data any [face/selected 1]]
 			select 1
-		fs: field 50 "16" 
+		fs: field 50 "14" 
 		react [result/font/size: fs/data]
 		button 30 "+"  [fs/data: fs/data + 1]
 		button 30 "-"  [fs/data: max 1 fs/data - 1]
@@ -255,6 +146,7 @@ view win: layout [
 			select 1
 		do [f/text: copy form appDir]
 ]
+
 ```
 
 
