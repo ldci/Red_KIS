@@ -154,7 +154,7 @@ view win: layout [
 
 This is an example for simplified chinese document. 
 
-![](/Users/fjouen/Programmation/Red/tesseract/pub/tesseract.jpg)
+![](https://github.com/ldci/Red_KIS/tree/main/Tesseract/pub)
 
 
  
