@@ -194,7 +194,7 @@ view win: layout [
 			cc/text: b/2
 		]
 	]
-	pad 2x0 cc: area 200x150 white middle center font-size 80 return
+	pad 2x0 cc: area 200x150 white middle center font-size 80 font-color black return
 	sb1: field 300
 	p: progress 140x23 sb2: field 50 ""
 	sb3: field 120 center
