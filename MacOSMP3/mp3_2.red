@@ -9,12 +9,8 @@ Red [
 ;--including a progress bar to follow the duration.
 fileName: ""
 fileInfo: ""
-prog: "" 
 vol: 1
 isFile?: false
-duration: 0.0     ; durée du morceau, en secondes
-durationText: copy ""
-elapsed: 0.0
 playing?: false
 
 loadFile: does [
@@ -26,10 +22,8 @@ loadFile: does [
 	tmp: request-file
 	unless none? tmp [
 		fileName: to string! to-file tmp
-		;win/text: fileName
 		isFile?: true
-		prog: rejoin ["afinfo '" fileName "'"]
-		call/output prog fileInfo
+		call/output rejoin ["afinfo '" fileName "'"] fileInfo
 		parse fileInfo [
 			thru "estimated duration:"
 			copy durationText to " sec"
@@ -45,19 +39,14 @@ playFile: does [
         elapsed: 0.0
         playing?: true
         p/data: 0%
-        prog: copy "afplay '"
-        append prog reduce [fileName "'"]
-        call prog
+        call rejoin ["afplay '" fileName "'"]
     ]
 ]
 setVolume: does [
 	vol: to-integer sl/data * 10 
 	fvol/text: to-string vol
-	volProg: copy "osascript -e 'set volume "
-	append volProg reduce [to-string vol "'"]
-	call volProg
+	call rejoin ["osascript -e 'set volume " form vol "'"]
 ]
-
 
 stopFile: does [
     playing?: false
@@ -66,7 +55,7 @@ stopFile: does [
 ]
 
 view win: layout [
-	title "macOS mp3 reader"
+	title "macOS music reader"
 	origin 10x10 space 10x10
 	button "Load" [loadFile]
 	button "Play" [playFile]
@@ -78,9 +67,10 @@ view win: layout [
 	return
 	info: area 500x250
 	return 
+	text "Duration"  60 middle
 	fduration: field center
-	p: progress 300 0%
-	timer: base 1x1 rate 10 on-time [
+	p: progress 230 0%
+	timer: base 1x1 rate 0:00:00.1 on-time [
     	if all [playing? duration > 0.0] [
         	elapsed: elapsed + 0.1
         	p/data: to percent! min 1.0 (elapsed / duration)
