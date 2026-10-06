@@ -1,17 +1,23 @@
 #! /usr/local/bin/red-view
 Red [
-	Title:   "macOS MP3 Player"
+	Title:   "macOS Sound Player"
 	Author:  "ldci"
 	File: 	 %mp3_2.red
 	Needs:	 'View
 ]
 
-;--including a progress bar to follow the duration.
-fileName: ""
-fileInfo: ""
+;--including a progress bar and % to follow the duration.
+fileName: none
+fileInfo: none
 vol: 1
 isFile?: false
 playing?: false
+;--Red/Sensei func
+shell-quote: func [s [string!]][
+    s: copy s
+    replace/all s "'" "'\''"
+    rejoin ["'" s "'"]
+]
 
 loadFile: does [
 	isFile?: false
@@ -23,14 +29,19 @@ loadFile: does [
 	unless none? tmp [
 		fileName: to string! to-file tmp
 		isFile?: true
-		call/output rejoin ["afinfo '" fileName "'"] fileInfo
-		parse fileInfo [
-			thru "estimated duration:"
-			copy durationText to " sec"
+		ret: call/output rejoin ["afinfo " shell-quote fileName] fileInfo
+		if ret = 0
+			[parse fileInfo [
+				thru "estimated duration:"
+				copy durationText to " sec"
+			]	
+			info/text: fileInfo
+			duration: to float! trim durationText
+			mduration: duration / 60 ;--in minutes
+			fduration/text: rejoin [form round/to mduration 0.01 " min"]
+			status/text: rejoin [" Reading file by afinfo: ==> OK"]
 		]
-		info/text: fileInfo
-		duration: to float! trim durationText
-		fduration/text: rejoin [form round/to duration 0.01 " sec"]
+		if ret <> 0 [status/text: "==> Error in afinfo reading file"]
 	]
 ]
 
@@ -39,7 +50,7 @@ playFile: does [
         elapsed: 0.0
         playing?: true
         p/data: 0%
-        call rejoin ["afplay '" fileName "'"]
+		call rejoin ["afplay " shell-quote fileName]
     ]
 ]
 setVolume: does [
@@ -55,7 +66,7 @@ stopFile: does [
 ]
 
 view win: layout [
-	title "macOS music reader"
+	title "macOS ARM-64 music reader"
 	origin 10x10 space 10x10
 	button "Load" [loadFile]
 	button "Play" [playFile]
@@ -67,17 +78,22 @@ view win: layout [
 	return
 	info: area 500x250
 	return 
-	text "Duration"  60 middle
+	text "Reading File" middle
+	status: field 405
+	return 
+	text "Duration"  80 middle
 	fduration: field center
-	p: progress 230 0%
+	p: progress 210 0%
+	;--100 ms for timer
 	timer: base 1x1 rate 0:00:00.1 on-time [
     	if all [playing? duration > 0.0] [
         	elapsed: elapsed + 0.1
-        	p/data: to percent! min 1.0 (elapsed / duration)
-        	ff/text: form round/to p/data 0.1
+        	p/data: to percent! min 1.0 (elapsed / duration) 	;--from 0.0 to 1.0
+        	;ff/text: form to percent! round/to p/data 0.1		;--in percent better view
+        	ff/text: rejoin [form round/to (elapsed / 60) 0.1 " min"]	
         	if elapsed >= duration [playing?: false]
     	]
 	]
-	ff: field 80 center
-	do [sl/data: 10% fvol/text: to-string vol]
+	ff: field 78 center
+	do [sl/data: 10% fvol/text: to-string vol timer/visible?: false]
 ]
