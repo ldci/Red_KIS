@@ -8,12 +8,14 @@ Red [
 ]
 
 makeUnicodeSymbols: function [
-"Generates unicode symbols from charcodes"
+"Generates unicode symbols from char codes"
 	s 		[string!]	;--string can be empty 
 	b 		[block!]	;--block of hexadecimal or integer values
 	return: [string!]	;--result
 ][
-	repeat i length? b [append s to-char b/:i]
+	result: copy s
+    repeat i length? b [append result to-char b/:i]
+    result
 ]
 
 

@@ -13,8 +13,11 @@ makeUnicodeSymbols: function [
 	b 		[block!]	;--block of hexadecimal or integer values
 	return: [string!]	;--result
 ][
-	repeat i length? b [append s to-char b/:i]
+	result: copy s
+    repeat i length? b [append result to-char b/:i]
+    result
 ]
+
 
 
 ;*************************** view test ******************************
@@ -25,7 +28,7 @@ view win: layout [
 	title "Zooming Test"
 	button 320x48  font-size 20 center str [quit] return
 	canvas: area 320x320 white center font-size 50 font-color blue return
-	sl: slider 270x24 [
+	sl: slider 270x25 [
 		canvas/font/size: to-integer 1 + (face/data * 199)
 		f/text: form to-percent round/to sl/data 0.01
 	]

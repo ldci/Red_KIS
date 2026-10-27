@@ -2,30 +2,17 @@
 Red [
 	Title: "unicode5"
 	Author: "ldci"
-	Version: 5.0
+	Version: 5.3
 	Notes: {This code allows to visualize basic unicode characters and most of emojis}
 	Needs: view
 ]
 
-darkMode: yes
-either darkMode [fcolor: white] [fcolor: black]
+darkMode?: yes
+either darkMode? [fcolor: white] [fcolor: black]
 
 margins: 5x5
 start: 0
 end: 127
-
-;-- 1. On crée la fenêtre secondaire à l'avance
-pop: layout [
-    title "Image Copy"
-    pop-img: image 400x300
-    ;-- On utilise visible? pour cacher la fenêtre
-    button "Close" [pop/visible?: no show pop] 
-]
-
-;-- 2. On l'enregistre dans le système en dehors de l'écran
-view/no-wait/options pop [offset: 10000x10000]
-pop/visible?: no
-show pop
 
 codes: [
 "0x0000-0x007F 0-127 Latin Basic"
@@ -97,15 +84,9 @@ codes: [
 "0x31A0-0x31BF 12704-12735 Bopomofo Extended"
 "0x3200-0x32FF 12800-13055 Enclosed CJK Letters and Months"
 "0x3300-0x33FF 13056-13311 CJK Compatibility"
-"0x3400-0x4DB5 13312-19893 CJK Unified Ideographs Extension A"
 "0x4E00-0x9FFF 19968-40959 CJK Unified Ideographs"
 "0xA000-0xA48F 40960-42127 Yi Syllables"
 "0xA490-0xA4CF 42128-42191 Yi Radicals"
-"0xAC00-0xD7A3 44032-55203 Hangul Syllables"
-"0xD800-0xDB7F 55296-56191 High Surrogates"
-"0xDB80-0xDBFF 56192-56319 High Private Use Surrogates"
-"0xDC00-0xDFFF 56320-57343 Low Surrogates"
-"0xE000-0xF8FF 57344-63743 Private Use"
 "0xF900-0xFAFF 63744-64255 CJK Compatibility Ideographs"
 "0xFB00-0xFB4F 64256-64335 Alphabetic Presentation Forms"
 "0xFB50-0xFDFF 64336-65023 Arabic Presentation Forms-A"
@@ -131,13 +112,16 @@ getUnicodes: does [
 	clear sb3/text
 	clear cc/text
 	p/data: 0%
-	;--get all unicode characters from selected codes
+	do-events/no-wait
+	;--get all characters from selected code
+	total: end - start + 1
 	i: start
 	while [i <= end] [
-		p/data: to-percent (i / end)
-		sb2/text: form to-percent round/to p/data 0.01
-		append list/data rejoin [i " : " to-char i]
-		i: i + 1
+    	append list/data rejoin [i " : " to-char i]
+    	p/data: to-percent ((i - start + 1) / total)
+    	sb2/text: form to-percent round/to p/data 0.01
+    	do-events/no-wait
+    	i: i + 1
 	]
 	;--get first unicode character in the selected list
 	list/selected: 1
@@ -149,27 +133,37 @@ getUnicodes: does [
 		f3/text:  rejoin [form end - start + 1 " Symbols"]
 		cc/text:  b/2
 	]
-	
 ]
 
+;--secondary image window
+pop: layout [
+    title "Image Copy"
+    pop-img: image 400x300
+    below
+    button  "Save Image"   100 [save fname pop-img/image alert rejoin [to-string fname " saved"]]
+    button  "Close Window" 100 [unview/only pop]
+]
+
+;--main window
 view win: layout [
 	title "Unicode Chart [UTF and Pictograms]"
 	origin margins space margins
-	text 85 "Code Number" middle 	f0: field 50 ""
-	text 40 "Start" middle		f1: field 55 "" 
-	text 30 "End"  middle 		f2: field 55 "" 
+	text 85 "Code Number" middle  	f0: field 50 ""
+	text 40 "Start" middle			f1: field 55 "" 
+	text 30 "End" middle  			f2: field 55 "" 
 	pad 160x0
 	f3: area 120x24 font-color fcolor center
 	pad 120x0  button "Quit" 80 [Quit] return
-	text-list 500x350 font-size 12 font-color fcolor data codes
+	;--list of codes
+	text-list 500x350 font-size 12 font-color fcolor data codes 
 	on-change [
-		f0/text: form face/selected
-		item: face/data/(face/selected)
+		f0/text: form face/selected		;--code number
+		item: face/data/(face/selected)	;--details of code
 		b: split item " "
-		range: split second b "-"
+		range: split second b "-"		;--get start and end values
 		n: length? b
-		if n = 3 [sb1/text: b/3]
-		;--more strings
+		if n = 3 [sb1/text: b/3]		;--code name (e.g. Emoticons)
+		;--more than one string for code name (e.g. Miscellaneous Symbols)
 		if n > 3 [
 			i: 3
 			str: copy ""
@@ -177,37 +171,34 @@ view win: layout [
 				append str rejoin [b/:i " "]
 				i: i + 1
 			] 
-			sb1/text: str
+			sb1/text: str				;--code name
 		]
 		f1/text: form start: to-integer range/1
 		f2/text: form end: to-integer range/2 
 		getUnicodes
 	]
-	
-	list: text-list 120x350 font-size 12 font-color fcolor data []
+	;--for each character in selected code
+	list: text-list 120x350 font-size 12 font-color fcolor data [] 
 	on-change [
 		attempt [
 			b: split face/data/(face/selected) " : "
 			v:  to-integer b/1
 			len: pick [6 4] v > FFFFh
 			sb3/text: rejoin [form to-hex/size v len "h"]
-			cc/text: b/2
+			cc/text: form b/2
 		]
 	]
-	pad 2x0 cc: area 200x150 white middle center font-size 80 font-color black return
+	
+	pad 2x0 cc: area 200x150 white middle center font-size 80 font-color black 
+	return
 	sb1: field 300
 	p: progress 140x23 sb2: field 50 ""
 	sb3: field 120 center
-    button 200 "Copy to the clipboard" [
-        img: to-image cc
-        write-clipboard img
-        ;-- 4. On met à jour l'image et on affiche la fenêtre
-        pop-img/image: img
-        pop/offset: 100x100
-        pop/visible?: yes
-        show pop
+	
+    button 200 "Show Image" [
+    	fname: to-red-file rejoin [sb3/text ".png"]	;--filename for saving
+        pop-img/image: to-image cc					;--character to image
+        view pop									;--show image window
     ]
-    
-    
 	do [f0/enabled?: f1/enabled?: f2/enabled?: no]
 ]
